@@ -1,20 +1,20 @@
 # Googletrans
 
-Language: English | [简体中文](./README_CN.md)
+Language: 简体中文 | [English](./README.md)
 
 [![Sourcegraph](https://sourcegraph.com/github.com/solywsh/go-googletrans/-/badge.svg)](https://sourcegraph.com/github.com/Conight/go-googletrans?badge)[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/Conight/go-googletrans/blob/master/LICENSE)
 
-> Transformation of t[Conight/go-googletrans](https://github.com/Conight/go-googletrans) project, support socks5/http proxy and replace it with resty client
+> 改造自[Conight/go-googletrans](https://github.com/Conight/go-googletrans)项目，新增支持socks5代理，更换为resty客户端
 
-## Download from Github
+## 从Github下载
 
 ```shell script
 GO111MODULE=on go get github.com/solywsh/go-googletrans
 ```
 
-## Quick Start Example
+## 快速开始
 
-### Simple translate
+### 简单翻译
 
 ```go
 package main
@@ -34,7 +34,7 @@ func main() {
 }
 ```
 
-### Using proxy
+### 使用代理
 
 ```go
 c := translator.Config{
@@ -44,7 +44,7 @@ c := translator.Config{
 t := translate.New(c)
 ```
 
-### Using custom service urls or user agent
+### 使用自定义服务 urls 或者 user agent
 
 ```go
 c := translator.Config{
@@ -54,13 +54,13 @@ c := translator.Config{
 t := translate.New(c)
 ```
 
-See [Examples](./examples) for more examples.
+完整示例： [Examples](./examples)
 
 ## Special thanks
 
 * [Conight/go-googletrans](https://github.com/Conight/go-googletrans)
 * [py-googletrans](https://github.com/ssut/py-googletrans)
 
-## License
+## 协议
 
 This SDK is distributed under the [The MIT License](https://opensource.org/licenses/MIT), see [LICENSE](./LICENSE) for more information.

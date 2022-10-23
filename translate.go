@@ -4,10 +4,8 @@ import (
 	"crypto/tls"
 	"encoding/json"
 	"fmt"
-	"io"
+	"github.com/go-resty/resty/v2"
 	"math/rand"
-	"net/http"
-	"net/url"
 	"strings"
 	"time"
 )
@@ -39,31 +37,12 @@ type sentence struct {
 
 type translator struct {
 	host   string
-	client *http.Client
+	client *resty.Client
 	ta     *tokenAcquirer
 }
 
 func randomChoose(slice []string) string {
 	return slice[rand.Intn(len(slice))]
-}
-
-type addHeaderTransport struct {
-	T              http.RoundTripper
-	defaultHeaders map[string]string
-}
-
-func (adt *addHeaderTransport) RoundTrip(req *http.Request) (*http.Response, error) {
-	for k, v := range adt.defaultHeaders {
-		req.Header.Add(k, v)
-	}
-	return adt.T.RoundTrip(req)
-}
-
-func newAddHeaderTransport(T http.RoundTripper, defaultHeaders map[string]string) *addHeaderTransport {
-	if T == nil {
-		T = http.DefaultTransport
-	}
-	return &addHeaderTransport{T, defaultHeaders}
 }
 
 func New(config ...Config) *translator {
@@ -79,26 +58,17 @@ func New(config ...Config) *translator {
 	if len(c.UserAgent) == 0 {
 		c.UserAgent = []string{defaultUserAgent}
 	}
-
 	host := randomChoose(c.ServiceUrls)
 	userAgent := randomChoose(c.UserAgent)
 	proxy := c.Proxy
-
-	transport := &http.Transport{}
+	client := resty.New().SetHeaders(map[string]string{
+		"User-Agent": userAgent,
+	})
 	// set proxy
-	if strings.HasPrefix(proxy, "http") {
-		proxyUrl, _ := url.Parse(proxy)
-		transport.Proxy = http.ProxyURL(proxyUrl)                         // set proxy
-		transport.TLSClientConfig = &tls.Config{InsecureSkipVerify: true} // skip verify
+	if strings.HasPrefix(proxy, "http") || strings.HasPrefix(proxy, "socks") {
+		client.SetProxy(proxy)
+		client.SetTLSClientConfig(&tls.Config{InsecureSkipVerify: true})
 	}
-
-	// new client with custom headers
-	client := &http.Client{
-		Transport: newAddHeaderTransport(transport, map[string]string{
-			"User-Agent": userAgent,
-		}),
-	}
-
 	ta := Token(host, client)
 	return &translator{
 		host:   host,
@@ -139,43 +109,27 @@ func (a *translator) translate(origin, src, dest string) (string, error) {
 		return "", err
 	}
 
-	// build request
-	client := &http.Client{}
-
-	tranUrl := fmt.Sprintf("https://%s/translate_a/single", a.host)
-	req, err := http.NewRequest("GET", tranUrl, nil)
+	resp, err := a.client.R().SetQueryParams(map[string]string{
+		"client": "gtx",
+		"sl":     src,
+		"tl":     dest,
+		"hl":     dest,
+		"tk":     tk,
+		"q":      origin,
+		"dt":     "t",
+		// "dt": "bd",
+		"dj":     "1",
+		"source": "popup",
+	}).Get(fmt.Sprintf("https://%s/translate_a/single", a.host))
 	if err != nil {
 		return "", err
 	}
-	q := req.URL.Query()
-	// params from chrome translate extension
-	params := buildParams(origin, src, dest, tk)
-	for i := range params {
-		q.Add(i, params[i])
-	}
-	q.Add("dt", "t")
-	q.Add("dt", "bd")
-	q.Add("dj", "1")
-	q.Add("source", "popup")
-	req.URL.RawQuery = q.Encode()
-
-	// do request
-	resp, err := client.Do(req)
-	if err != nil {
-		return "", err
-	}
-	defer resp.Body.Close()
-	if resp.StatusCode == 200 {
-		body, err := io.ReadAll(resp.Body)
-		if err != nil {
-			return "", err
-		}
+	if resp.StatusCode() == 200 {
 		var sentences sentences
-		err = json.Unmarshal(body, &sentences)
+		err = json.Unmarshal(resp.Body(), &sentences)
 		if err != nil {
 			return "", err
 		}
-
 		translated := ""
 		// parse trans
 		for _, s := range sentences.Sentences {
@@ -185,16 +139,4 @@ func (a *translator) translate(origin, src, dest string) (string, error) {
 	} else {
 		return "", fmt.Errorf("request error")
 	}
-}
-
-func buildParams(query, src, dest, token string) map[string]string {
-	params := map[string]string{
-		"client": "gtx",
-		"sl":     src,
-		"tl":     dest,
-		"hl":     dest,
-		"tk":     token,
-		"q":      query,
-	}
-	return params
 }

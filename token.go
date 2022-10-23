@@ -2,9 +2,8 @@ package translator
 
 import (
 	"fmt"
-	"io"
+	"github.com/go-resty/resty/v2"
 	"math"
-	"net/http"
 	"regexp"
 	"strconv"
 	"strings"
@@ -16,10 +15,10 @@ var ReTkk = regexp.MustCompile(`tkk:'(.+?)'`)
 type tokenAcquirer struct {
 	tkk    string
 	host   string
-	client *http.Client
+	client *resty.Client
 }
 
-func Token(host string, client *http.Client) *tokenAcquirer {
+func Token(host string, client *resty.Client) *tokenAcquirer {
 	host = strings.ToLower(host)
 	if !strings.HasPrefix(host, "http") {
 		host = "https://" + host
@@ -48,16 +47,11 @@ func (a *tokenAcquirer) update() error {
 		return nil
 	}
 
-	resp, err := a.client.Get(a.host)
+	resp, err := a.client.R().Get(a.host)
 	if err != nil {
 		return err
 	}
-	defer resp.Body.Close()
-	body, err := io.ReadAll(resp.Body)
-	if err != nil {
-		return err
-	}
-	rawTkk := ReTkk.FindStringSubmatch(string(body))
+	rawTkk := ReTkk.FindStringSubmatch(resp.String())
 	if len(rawTkk) > 0 {
 		a.tkk = rawTkk[1]
 		return nil
