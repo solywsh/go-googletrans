@@ -4,7 +4,7 @@ English | [简体中文](./README_CN.md)
 
 [![Sourcegraph](https://sourcegraph.com/github.com/solywsh/go-googletrans/-/badge.svg)](https://sourcegraph.com/github.com/Conight/go-googletrans?badge)[![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://github.com/Conight/go-googletrans/blob/master/LICENSE)
 
-> Transformation of t[Conight/go-googletrans](https://github.com/Conight/go-googletrans) project, support socks5/http proxy and replace it with resty client
+> Transformation of [Conight/go-googletrans](https://github.com/Conight/go-googletrans) project, support socks5/http proxy and replace it with resty client
 
 ## Download from Github
 
