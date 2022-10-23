@@ -9,7 +9,7 @@ import (
 func TestTranslator_Translate(t *testing.T) {
 	origin := "你好，世界！"
 	c := Config{
-		Proxy:       "socks5://127.0.0.1:7890",
+		Proxy:       "socks5://10.10.40.10:30001",
 		UserAgent:   []string{"Custom Agent"},
 		ServiceUrls: []string{"translate.google.com.hk"},
 	}

@@ -53,7 +53,7 @@ func New(config ...Config) *translator {
 	}
 	// set default value
 	if len(c.ServiceUrls) == 0 {
-		c.ServiceUrls = []string{"translate.google.com"}
+		c.ServiceUrls = defaultServiceUrls
 	}
 	if len(c.UserAgent) == 0 {
 		c.UserAgent = []string{defaultUserAgent}
@@ -89,8 +89,10 @@ func (a *translator) Translate(origin, src, dest string) (*translated, error) {
 	if val, ok := languages[dest]; !ok || val == "auto" {
 		return nil, fmt.Errorf("dest language code error")
 	}
-
-	text, err := a.translate(origin, src, dest)
+	text, err := a.translate(origin, src, dest, false)
+	if err != nil || text == "" {
+		text, err = a.translate(origin, src, dest, true)
+	}
 	if err != nil {
 		return nil, err
 	}
@@ -103,12 +105,17 @@ func (a *translator) Translate(origin, src, dest string) (*translated, error) {
 	return result, nil
 }
 
-func (a *translator) translate(origin, src, dest string) (string, error) {
+func (a *translator) translate(origin, src, dest string, defaultUrl bool) (string, error) {
+	var host string
+	if defaultUrl {
+		host = defaultServiceUrl
+	} else {
+		host = a.host
+	}
 	tk, err := a.ta.do(origin)
 	if err != nil {
 		return "", err
 	}
-
 	resp, err := a.client.R().SetQueryParams(map[string]string{
 		"client": "gtx",
 		"sl":     src,
@@ -120,7 +127,7 @@ func (a *translator) translate(origin, src, dest string) (string, error) {
 		// "dt": "bd",
 		"dj":     "1",
 		"source": "popup",
-	}).Get(fmt.Sprintf("https://%s/translate_a/single", a.host))
+	}).Get(fmt.Sprintf("https://%s/translate_a/single", host))
 	if err != nil {
 		return "", err
 	}
