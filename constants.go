@@ -2,7 +2,7 @@ package translator
 
 var defaultUserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"
 
-var defaultServiceUrl = "translate.google.cn"
+var defaultServiceUrl = "translate.google.com"
 
 var defaultServiceUrls = []string{
 	"translate.google.ac", "translate.google.ad", "translate.google.ae",
