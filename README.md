@@ -44,6 +44,33 @@ c := translator.Config{
 t := translate.New(c)
 ```
 
+### Test the response time of each service
+
+```go
+c := Config{
+		Proxy: "socks5://127.0.0.1:7890",
+}
+trans := New(c)
+trans.Latency(trans.AllServiceUrls())
+
+// Output
+Host:  translate.google.ac Time average:  896.617266ms
+Host:  translate.google.ad Time average:  787.691933ms
+Host:  translate.google.ae Time average:  749.772166ms
+Host:  translate.google.al Time average:  712.4626ms
+Host:  translate.google.am Time average:  796.3925ms
+Host:  translate.google.as Time average:  750.585733ms
+Host:  translate.google.at Time average:  847.926733ms
+...
+Host:  translate.google.to Time average:  648.1111ms
+Host:  translate.google.tt Time average:  583.769633ms
+Host:  translate.google.us Time average:  540.138666ms
+Host:  translate.google.vg Time average:  575.703566ms
+Host:  translate.google.vu Time average:  673.641833ms
+Host:  translate.google.ws Time average:  563.181933ms
+fastest: translate.google.com.ec 466.401633ms
+```
+
 ### Using custom service urls or user agent
 
 ```go

@@ -22,4 +22,7 @@ func main() {
 		panic(err)
 	}
 	fmt.Println(result.Text)
+
+	// Latency test
+	trans.Latency(trans.AllServiceUrls())
 }
