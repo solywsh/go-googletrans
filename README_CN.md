@@ -68,7 +68,7 @@ import (
 
 func main() {
 	t := translator.New()
-	t.Latency(t.AllServiceUrls())
+	t.Latency(translator.AllServiceUrls())
 }
 
 // Output

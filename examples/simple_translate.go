@@ -22,5 +22,5 @@ func main() {
 	fmt.Println(result.Text)
 
 	// Latency test
-	t.Latency(t.AllServiceUrls())
+	t.Latency(translator.AllServiceUrls())
 }

@@ -7,7 +7,7 @@ import (
 
 // AllServiceUrls
 // Returns all the services that are currently available.
-func (t *Translator) AllServiceUrls() []string {
+func AllServiceUrls() []string {
 	return serviceUrls
 }
 
