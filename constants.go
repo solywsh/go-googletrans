@@ -1,12 +1,8 @@
 package translator
 
-var defaultUserAgent = "Mozilla/5.0 (Windows NT 10.0; Win64; x64)"
-
-var defaultServiceUrl = "translate.google.com"
-
-var defaultServiceUrls = []string{
+var serviceUrls = []string{
 	"translate.google.ac", "translate.google.ad", "translate.google.ae",
-	"translate.google.al", "translate.google.am", "translate.google.as",
+	"translate.google.am", "translate.google.as", "translate.google.ws",
 	"translate.google.at", "translate.google.az", "translate.google.ba",
 	"translate.google.be", "translate.google.bf", "translate.google.bg",
 	"translate.google.bi", "translate.google.bj", "translate.google.bs",
@@ -14,7 +10,7 @@ var defaultServiceUrls = []string{
 	"translate.google.cat", "translate.google.cc", "translate.google.cd",
 	"translate.google.cf", "translate.google.cg", "translate.google.ch",
 	"translate.google.ci", "translate.google.cl", "translate.google.cm",
-	"translate.google.cn", "translate.google.co.ao", "translate.google.co.bw",
+	"translate.google.co.ao", "translate.google.co.bw",
 	"translate.google.co.ck", "translate.google.co.cr", "translate.google.co.id",
 	"translate.google.co.il", "translate.google.co.in", "translate.google.co.jp",
 	"translate.google.co.ke", "translate.google.co.kr", "translate.google.co.ls",
@@ -22,7 +18,7 @@ var defaultServiceUrls = []string{
 	"translate.google.co.th", "translate.google.co.tz", "translate.google.co.ug",
 	"translate.google.co.uk", "translate.google.co.uz", "translate.google.co.ve",
 	"translate.google.co.vi", "translate.google.co.za", "translate.google.co.zm",
-	"translate.google.co.zw", "translate.google.co", "translate.google.com.af",
+	"translate.google.co.zw", "translate.google.com.af",
 	"translate.google.com.ag", "translate.google.com.ai", "translate.google.com.ar",
 	"translate.google.com.au", "translate.google.com.bd", "translate.google.com.bh",
 	"translate.google.com.bn", "translate.google.com.bo", "translate.google.com.br",
@@ -31,7 +27,7 @@ var defaultServiceUrls = []string{
 	"translate.google.com.eg", "translate.google.com.et", "translate.google.com.fj",
 	"translate.google.com.gh", "translate.google.com.gi", "translate.google.com.gt",
 	"translate.google.com.hk", "translate.google.com.jm", "translate.google.com.kh",
-	"translate.google.com.kw", "translate.google.com.lb", "translate.google.com.lc",
+	"translate.google.com.kw", "translate.google.com.lb",
 	"translate.google.com.ly", "translate.google.com.mm", "translate.google.com.mt",
 	"translate.google.com.mx", "translate.google.com.my", "translate.google.com.na",
 	"translate.google.com.ng", "translate.google.com.ni", "translate.google.com.np",
@@ -42,10 +38,10 @@ var defaultServiceUrls = []string{
 	"translate.google.com.sl", "translate.google.com.sv", "translate.google.com.tj",
 	"translate.google.com.tr", "translate.google.com.tw", "translate.google.com.ua",
 	"translate.google.com.uy", "translate.google.com.vc", "translate.google.com.vn",
-	"translate.google.com", "translate.google.cv", "translate.google.cx",
+	"translate.google.com", "translate.google.cv",
 	"translate.google.cz", "translate.google.de", "translate.google.dj",
 	"translate.google.dk", "translate.google.dm", "translate.google.dz",
-	"translate.google.ee", "translate.google.es", "translate.google.eu",
+	"translate.google.ee", "translate.google.es",
 	"translate.google.fi", "translate.google.fm", "translate.google.fr",
 	"translate.google.ga", "translate.google.ge", "translate.google.gf",
 	"translate.google.gg", "translate.google.gl", "translate.google.gm",
@@ -72,7 +68,12 @@ var defaultServiceUrls = []string{
 	"translate.google.tk", "translate.google.tl", "translate.google.tm",
 	"translate.google.tn", "translate.google.to", "translate.google.tt",
 	"translate.google.us", "translate.google.vg", "translate.google.vu",
-	"translate.google.ws",
+	"translate.google.al",
+	// "translate.google.cn",
+	// "translate.google.co",
+	// "translate.google.com.lc",
+	// "translate.google.cx",
+	// "translate.google.eu",
 }
 
 var languages = map[string]string{

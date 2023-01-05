@@ -1,22 +1,20 @@
 //go:build ignore
-// +build ignore
 
 package main
 
 import (
 	"fmt"
+	translator "github.com/solywsh/go-googletrans"
 )
 
 var content = `你好，世界！`
 
 func main() {
-	c := translator.Config{
-		Proxy: "http://127.0.0.1:1087",
-		// Proxy: "socks5://127.0.0.1:7890",
-		UserAgent:   []string{"Custom Agent"},
-		ServiceUrls: []string{"translate.google.com.hk"},
-	}
-	t := translator.New(c)
+	t := translator.New(
+		translator.WithProxy("http://127.0.0.1:7890"),
+		translator.WithUserAgent("Custom Agent"),
+		translator.WithServiceUrl("translate.google.com.hk"),
+	)
 	result, err := t.Translate(content, "auto", "en")
 	if err != nil {
 		panic(err)
@@ -24,5 +22,5 @@ func main() {
 	fmt.Println(result.Text)
 
 	// Latency test
-	trans.Latency(trans.AllServiceUrls())
+	t.Latency(t.AllServiceUrls())
 }

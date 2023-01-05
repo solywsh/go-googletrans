@@ -10,19 +10,12 @@ import (
 	"time"
 )
 
-// Config basic config.
-type Config struct {
-	ServiceUrls []string
-	UserAgent   []string
-	Proxy       string
-}
-
-// translated result object.
-type translated struct {
+// Translated result object.
+type Translated struct {
 	Src    string // source language
 	Dest   string // destination language
 	Origin string // original text
-	Text   string // translated text
+	Text   string // Translated text
 }
 
 type sentences struct {
@@ -35,52 +28,82 @@ type sentence struct {
 	Backend int    `json:"backend"`
 }
 
-type translator struct {
-	host   string
-	client *resty.Client
-	ta     *tokenAcquirer
+type Translator struct {
+	randomEverytime bool     // random service url every time
+	randomServices  []string // random service url list
+	serviceUrl      string
+	client          *resty.Client
+	ta              *TokenAcquirer
 }
 
 func randomChoose(slice []string) string {
+	rand.Seed(time.Now().Unix())
 	return slice[rand.Intn(len(slice))]
 }
 
-func New(config ...Config) *translator {
-	rand.Seed(time.Now().Unix())
-	var c Config
-	if len(config) > 0 {
-		c = config[0]
+type Option func(*Translator)
+
+func WithServiceUrl(serviceUrl string) Option {
+	return func(t *Translator) {
+		t.ta = Token(serviceUrl, t.client)
+		t.serviceUrl = serviceUrl
 	}
-	// set default value
-	if len(c.ServiceUrls) == 0 {
-		c.ServiceUrls = defaultServiceUrls
+}
+
+func WithRandomServiceUrl() Option {
+	return func(t *Translator) {
+		t.serviceUrl = randomChoose(serviceUrls)
+		t.ta = Token(t.serviceUrl, t.client)
 	}
-	if len(c.UserAgent) == 0 {
-		c.UserAgent = []string{defaultUserAgent}
+}
+
+func WithUserAgent(userAgent string) Option {
+	return func(t *Translator) {
+		t.client.SetHeaders(map[string]string{
+			"User-Agent": userAgent,
+		})
 	}
-	host := randomChoose(c.ServiceUrls)
-	userAgent := randomChoose(c.UserAgent)
-	proxy := c.Proxy
-	client := resty.New().SetHeaders(map[string]string{
-		"User-Agent": userAgent,
-	})
-	// set proxy
-	if strings.HasPrefix(proxy, "http") || strings.HasPrefix(proxy, "socks") {
-		client.SetProxy(proxy)
-		client.SetTLSClientConfig(&tls.Config{InsecureSkipVerify: true})
+}
+
+func WithProxy(proxy string) Option {
+	return func(translator *Translator) {
+		translator.client.SetProxy(proxy)
+		translator.client.SetTLSClientConfig(&tls.Config{InsecureSkipVerify: true})
 	}
-	ta := Token(host, client)
-	return &translator{
-		host:   host,
-		client: client,
-		ta:     ta,
+}
+
+func WithRetryTimes(times int) Option {
+	return func(translator *Translator) {
+		translator.client.SetRetryCount(times)
 	}
+}
+
+func WithRandomServiceUrlEveryTime(serviceUrlList []string) Option {
+	return func(t *Translator) {
+		t.randomEverytime = true
+		t.randomServices = serviceUrlList
+	}
+}
+
+func New(options ...Option) *Translator {
+	client := resty.New().
+		SetHeaders(map[string]string{
+			"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64)",
+		}).SetRetryCount(3)
+	t := &Translator{
+		serviceUrl: "translate.google.com",
+		client:     client,
+		ta:         Token("translate.google.com", client),
+	}
+	for _, option := range options {
+		option(t)
+	}
+	return t
 }
 
 // Translate given content.
 // Set src to `auto` and system will attempt to identify the source language automatically.
-func (a *translator) Translate(origin, src, dest string) (*translated, error) {
-	// check src & dest
+func (t *Translator) Translate(origin, src, dest string) (*Translated, error) {
 	src = strings.ToLower(src)
 	dest = strings.ToLower(dest)
 	if _, ok := languages[src]; !ok {
@@ -89,14 +112,15 @@ func (a *translator) Translate(origin, src, dest string) (*translated, error) {
 	if val, ok := languages[dest]; !ok || val == "auto" {
 		return nil, fmt.Errorf("dest language code error")
 	}
-	text, err := a.translate(origin, src, dest, false)
-	if err != nil || text == "" {
-		text, err = a.translate(origin, src, dest, true)
+	if t.randomEverytime {
+		t.serviceUrl = randomChoose(t.randomServices)
+		t.ta = Token(t.serviceUrl, t.client)
 	}
+	text, err := t.translate(origin, src, dest)
 	if err != nil {
 		return nil, err
 	}
-	result := &translated{
+	result := &Translated{
 		Src:    src,
 		Dest:   dest,
 		Origin: origin,
@@ -105,18 +129,12 @@ func (a *translator) Translate(origin, src, dest string) (*translated, error) {
 	return result, nil
 }
 
-func (a *translator) translate(origin, src, dest string, defaultUrl bool) (string, error) {
-	var host string
-	if defaultUrl {
-		host = defaultServiceUrl
-	} else {
-		host = a.host
-	}
-	tk, err := a.ta.do(origin)
+func (t *Translator) translate(origin, src, dest string) (string, error) {
+	tk, err := t.ta.do(origin)
 	if err != nil {
 		return "", err
 	}
-	resp, err := a.client.R().SetQueryParams(map[string]string{
+	resp, err := t.client.R().SetQueryParams(map[string]string{
 		"client": "gtx",
 		"sl":     src,
 		"tl":     dest,
@@ -127,7 +145,7 @@ func (a *translator) translate(origin, src, dest string, defaultUrl bool) (strin
 		// "dt": "bd",
 		"dj":     "1",
 		"source": "popup",
-	}).Get(fmt.Sprintf("https://%s/translate_a/single", host))
+	}).Get(fmt.Sprintf("https://%s/translate_a/single", t.serviceUrl))
 	if err != nil {
 		return "", err
 	}

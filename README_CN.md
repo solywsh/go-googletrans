@@ -9,7 +9,7 @@
 ## 从Github下载
 
 ```shell script
-GO111MODULE=on go get github.com/solywsh/go-googletrans
+GO111MODULE=on go get git.xasoc.lnlog.cc/solywsh.wang/go-googletrans
 ```
 
 ## 快速开始
@@ -21,7 +21,7 @@ package main
 
 import (
 	"fmt"
-	"github.com/solywsh/go-googletrans"
+	"git.xasoc.lnlog.cc/solywsh.wang/go-googletrans"
 )
 
 func main() {
@@ -37,21 +37,39 @@ func main() {
 ### 使用代理
 
 ```go
-c := translator.Config{
-    Proxy: "http://PROXY_HOST:PROXY_PORT",
-    // Proxy: "socks5://PROXY_HOST:PROXY_PORT"
+package main
+
+import (
+	"fmt"
+	translator "github.com/solywsh/go-googletrans"
+)
+
+func main() {
+	t := translator.New(
+		translator.WithProxy("http://127.0.0.1:7890"),
+	)
+	result, err := t.Translate(`你好，世界！`, "auto", "en")
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println(result.Text)
 }
-t := translate.New(c)
 ```
 
 ### 测试各节点响应时间
 
 ```go
-c := Config{
-		Proxy: "socks5://127.0.0.1:7890",
+package main
+
+import (
+	"fmt"
+	translator "github.com/solywsh/go-googletrans"
+)
+
+func main() {
+	t := translator.New()
+	t.Latency(t.AllServiceUrls())
 }
-trans := New(c)
-trans.Latency(trans.AllServiceUrls())
 
 // Output
 Host:  translate.google.ac Time average:  896.617266ms
@@ -74,11 +92,25 @@ fastest: translate.google.com.ec 466.401633ms
 ### 使用自定义服务 urls 或者 user agent
 
 ```go
-c := translator.Config{
-    UserAgent: []string{"Custom Agent"},
-    ServiceUrls: []string{"translate.google.com.hk"},
+package main
+
+import (
+	"fmt"
+	translator "github.com/solywsh/go-googletrans"
+)
+
+func main() {
+	t := translator.New(
+		translator.WithProxy("http://127.0.0.1:7890"),
+		translator.WithUserAgent("Custom Agent"),
+		translator.WithServiceUrl("translate.google.com.hk"),
+	)
+	result, err := t.Translate(`你好，世界！`, "auto", "en")
+	if err != nil {
+		panic(err)
+	}
+	fmt.Println(result.Text)
 }
-t := translate.New(c)
 ```
 
 完整示例： [Examples](./examples)

@@ -12,25 +12,25 @@ import (
 
 var ReTkk = regexp.MustCompile(`tkk:'(.+?)'`)
 
-type tokenAcquirer struct {
+type TokenAcquirer struct {
 	tkk    string
 	host   string
 	client *resty.Client
 }
 
-func Token(host string, client *resty.Client) *tokenAcquirer {
+func Token(host string, client *resty.Client) *TokenAcquirer {
 	host = strings.ToLower(host)
 	if !strings.HasPrefix(host, "http") {
 		host = "https://" + host
 	}
-	return &tokenAcquirer{
+	return &TokenAcquirer{
 		tkk:    "0",
 		host:   host,
 		client: client,
 	}
 }
 
-func (a *tokenAcquirer) do(text string) (string, error) {
+func (a *TokenAcquirer) do(text string) (string, error) {
 	err := a.update()
 	if err != nil {
 		return "", err
@@ -39,7 +39,7 @@ func (a *tokenAcquirer) do(text string) (string, error) {
 	return tk, nil
 }
 
-func (a *tokenAcquirer) update() error {
+func (a *TokenAcquirer) update() error {
 	now := int(math.Floor(float64(time.Now().UnixNano()) / 1000000.00 / 3600000.00))
 
 	tkk, _ := strconv.Atoi(strings.Split(a.tkk, ".")[0])
@@ -59,7 +59,7 @@ func (a *tokenAcquirer) update() error {
 	return nil
 }
 
-func (a *tokenAcquirer) acquire(text string) string {
+func (a *TokenAcquirer) acquire(text string) string {
 	var textSlice []int
 	for _, value := range text {
 		val := int(value)
