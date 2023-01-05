@@ -56,7 +56,7 @@ var serviceUrls = []string{
 	"translate.google.md", "translate.google.me", "translate.google.mg",
 	"translate.google.mk", "translate.google.ml", "translate.google.mn",
 	"translate.google.ms", "translate.google.mu", "translate.google.mv",
-	"translate.google.mw", "translate.google.ne", "translate.google.nf",
+	"translate.google.mw", "translate.google.ne",
 	"translate.google.nl", "translate.google.no", "translate.google.nr",
 	"translate.google.nu", "translate.google.pl", "translate.google.pn",
 	"translate.google.ps", "translate.google.pt", "translate.google.ro",
@@ -69,11 +69,13 @@ var serviceUrls = []string{
 	"translate.google.tn", "translate.google.to", "translate.google.tt",
 	"translate.google.us", "translate.google.vg", "translate.google.vu",
 	"translate.google.al",
+	/* Unavailable */
 	// "translate.google.cn",
 	// "translate.google.co",
 	// "translate.google.com.lc",
 	// "translate.google.cx",
 	// "translate.google.eu",
+	// "translate.google.nf",
 }
 
 var languages = map[string]string{
