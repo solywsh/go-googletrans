@@ -9,7 +9,7 @@ English | [简体中文](./README_CN.md)
 ## Download from Github
 
 ```shell script
-GO111MODULE=on go get git.xasoc.lnlog.cc/solywsh.wang/go-googletrans
+GO111MODULE=on go get github.com/solywsh/go-googletrans
 ```
 
 ## Quick Start Example
@@ -21,7 +21,7 @@ package main
 
 import (
 	"fmt"
-	"git.xasoc.lnlog.cc/solywsh.wang/go-googletrans"
+	"github.com/solywsh/go-googletrans"
 )
 
 func main() {
